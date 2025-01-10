@@ -1,0 +1,142 @@
+USE LibraryManagement;
+
+--Tables
+
+CREATE TABLE AdminsAndLibrarians (
+    UserID VARCHAR(5) PRIMARY KEY, -- Auto-generated in the format "U0001"
+    Username VARCHAR(50) NOT NULL UNIQUE,
+    Password VARCHAR(255) NOT NULL, -- Password should be stored hashed
+    Role VARCHAR(10) NOT NULL CHECK (Role IN ('Admin', 'Librarian')), -- Using CHECK constraint to enforce 'Admin' or 'Librarian'
+    Name VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) UNIQUE,
+    ContactNumber VARCHAR(15)
+);
+
+CREATE TABLE Books (
+    BookID VARCHAR(5) PRIMARY KEY, -- Auto-generated in the format "B0001"
+    Title VARCHAR(255) NOT NULL,
+    Author VARCHAR(255) NOT NULL,
+    Genre VARCHAR(100),
+    TotalCopies INT NOT NULL,
+    AvailableCopies INT NOT NULL
+);
+
+CREATE TABLE Students (
+    StudentID VARCHAR(5) PRIMARY KEY, -- Auto-generated in the format "S0001"
+    Name VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) UNIQUE,
+    ContactNumber VARCHAR(15)
+);
+
+CREATE TABLE BorrowRecords (
+    RecordID VARCHAR(5) PRIMARY KEY, -- Auto-generated in the format "R0001"
+    StudentID VARCHAR(5),
+    BookID VARCHAR(5),
+    BorrowDate DATE NOT NULL,
+    ReturnDate DATE,
+    Fine DECIMAL(10, 2) DEFAULT 0,
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    FOREIGN KEY (BookID) REFERENCES Books(BookID)
+);
+
+--mysql triggers
+
+--AdminsAndLibrarians trigger
+DELIMITER $$
+
+CREATE TRIGGER trg_AdminsAndLibrarians_PK
+BEFORE INSERT ON AdminsAndLibrarians
+FOR EACH ROW
+BEGIN
+    DECLARE next_id INT;
+    DECLARE formatted_id VARCHAR(5);
+
+    -- Get the maximum numeric ID from existing records
+    SELECT IFNULL(MAX(CAST(SUBSTRING(UserID, 2, 4) AS UNSIGNED)), 0) + 1
+    INTO next_id
+    FROM AdminsAndLibrarians;
+
+    -- Format the next ID as "U0001", "U0002", etc.
+    SET formatted_id = CONCAT('U', LPAD(next_id, 4, '0'));
+
+    -- Set the UserID for the new row
+    SET NEW.UserID = formatted_id;
+END $$
+
+DELIMITER ;
+
+--books
+DELIMITER $$
+
+CREATE TRIGGER trg_Books_PK
+BEFORE INSERT ON Books
+FOR EACH ROW
+BEGIN
+    DECLARE next_id INT;
+    DECLARE formatted_id VARCHAR(5);
+
+    -- Get the maximum numeric ID from existing records
+    SELECT IFNULL(MAX(CAST(SUBSTRING(BookID, 2, 4) AS UNSIGNED)), 0) + 1
+    INTO next_id
+    FROM Books;
+
+    -- Format the next ID as "B0001", "B0002", etc.
+    SET formatted_id = CONCAT('B', LPAD(next_id, 4, '0'));
+
+    -- Set the BookID for the new row
+    SET NEW.BookID = formatted_id;
+END $$
+
+DELIMITER ;
+
+
+--students
+DELIMITER $$
+
+CREATE TRIGGER trg_Students_PK
+BEFORE INSERT ON Students
+FOR EACH ROW
+BEGIN
+    DECLARE next_id INT;
+    DECLARE formatted_id VARCHAR(5);
+
+    -- Get the maximum numeric ID from existing records
+    SELECT IFNULL(MAX(CAST(SUBSTRING(StudentID, 2, 4) AS UNSIGNED)), 0) + 1
+    INTO next_id
+    FROM Students;
+
+    -- Format the next ID as "S0001", "S0002", etc.
+    SET formatted_id = CONCAT('S', LPAD(next_id, 4, '0'));
+
+    -- Set the StudentID for the new row
+    SET NEW.StudentID = formatted_id;
+END $$
+
+DELIMITER ;
+
+--borrow records
+DELIMITER $$
+
+CREATE TRIGGER trg_BorrowRecords_PK
+BEFORE INSERT ON BorrowRecords
+FOR EACH ROW
+BEGIN
+    DECLARE next_id INT;
+    DECLARE formatted_id VARCHAR(5);
+
+    -- Get the maximum numeric ID from existing records
+    SELECT IFNULL(MAX(CAST(SUBSTRING(RecordID, 2, 4) AS UNSIGNED)), 0) + 1
+    INTO next_id
+    FROM BorrowRecords;
+
+    -- Format the next ID as "R0001", "R0002", etc.
+    SET formatted_id = CONCAT('R', LPAD(next_id, 4, '0'));
+
+    -- Set the RecordID for the new row
+    SET NEW.RecordID = formatted_id;
+END $$
+
+DELIMITER ;
+
+
+

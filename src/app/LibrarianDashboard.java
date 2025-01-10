@@ -13,6 +13,11 @@ import java.awt.Font;
 import javax.swing.SwingConstants;
 
 import db.DatabaseConnection;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 
 import javax.swing.JButton;
 import java.awt.SystemColor;
@@ -176,21 +181,62 @@ public class LibrarianDashboard {
 
         // Add action listeners to menu items
         op1.addActionListener(e -> {
-            JOptionPane.showMessageDialog(frame, "Navigating to Non-Returned Books Report");
-            //AccountDetails ad = new AccountDetails();
-            //ad.show();
+            JOptionPane.showMessageDialog(frame, "Generating Non-Returned Books Report");
+            try {
+                String jrxmlFilePath = "src/resources/reports/UnreturnedBooks.jrxml";
+
+                // Compile the JRXML file to a JasperReport
+                JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlFilePath);
+                Connection connection = DatabaseConnection.getConnection();
+
+                // Fill the report with data from the database
+                JasperPrint jasper = JasperFillManager.fillReport(jasperReport, null, connection);
+
+                JasperViewer.viewReport(jasper);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Failed to generate report: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         op2.addActionListener(e -> {
-            JOptionPane.showMessageDialog(frame, "Navigating to Monthly Fine Report");
-            //StudentDetails sd = new StudentDetails();
-            //sd.show();
+            JOptionPane.showMessageDialog(frame, "Generating Monthly Fine Report");
+            try {
+                String jrxmlFilePath = "src/resources/reports/MonthlyFine.jrxml";
+
+             // Compile the JRXML file to a JasperReport
+                JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlFilePath);
+                Connection connection = DatabaseConnection.getConnection();
+
+                // Fill the report with data from the database
+                JasperPrint jasper = JasperFillManager.fillReport(jasperReport, null, connection);
+
+                JasperViewer.viewReport(jasper);
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Failed to generate report: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         op3.addActionListener(e -> {
-            JOptionPane.showMessageDialog(frame, "Navigating to Newly Added Books Report");
-            //BookDetails bd = new BookDetails();
-            //bd.show();
+        	JOptionPane.showMessageDialog(frame, "Generating Newly Added Books Report");
+            try {
+                String jrxmlFilePath = "src/resources/reports/NewlyAddedBooks.jrxml";
+
+             // Compile the JRXML file to a JasperReport
+                JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlFilePath);
+                Connection connection = DatabaseConnection.getConnection();
+
+                // Fill the report with data from the database
+                JasperPrint jasper = JasperFillManager.fillReport(jasperReport, null, connection);
+
+                JasperViewer.viewReport(jasper);
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Failed to generate report: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 		lblReports.setForeground(Color.BLACK);
 		lblReports.addMouseListener(new java.awt.event.MouseAdapter() {
